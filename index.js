@@ -5,7 +5,7 @@ import { chat } from "../../../../script.js";
 const extensionName = "SillyTavern-WebSocketClient";
 const defaultSettings = {
     wsUrl: "127.0.0.1",
-    wsPort: 9919,
+    wsPort: 9918,
     autoConnect: false
 };
 
