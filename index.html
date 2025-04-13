@@ -1,0 +1,51 @@
+<div id="SillyTavern-WebSocket-Client_settings">
+    <div class="inline-drawer">
+        <div class="inline-drawer-toggle inline-drawer-header">
+            <b>WebSocket客户端</b>
+            <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
+        </div>
+        <div class="inline-drawer-content">
+            <div class="WebSocket-Client_connection">
+                <div class="WebSocket-Client_server_settings">
+                    <div class="WebSocket-Client_url_input">
+                        <label>服务器地址:</label>
+                        <input type="text" id="ws_url" value="127.0.0.1" />
+                    </div>
+                    <div class="WebSocket-Client_port_input">
+                        <label>端口:</label>
+                        <input type="number" id="ws_port" value="9919" />
+                    </div>
+                </div>
+                <div class="WebSocket-Client_controls">
+                    <input type="button" id="ws_connect" value="连接" />
+                    <input type="button" id="ws_disconnect" value="断开" disabled />
+                    <label>
+                        <input type="checkbox" id="ws_auto_connect"/>
+                        自动重连
+                    </label>
+                </div>
+            </div>
+            <div class="WebSocket-Client_status">
+                <label>连接状态:</label>
+                <div id="ws_status" style="color: red;">未连接</div>
+            </div>
+            <div class="WebSocket-Client_debug">
+                <label>调试信息:</label>
+                <textarea id="debug_log" rows="10" style="width: 100%; background-color: var(--background-color); color: var(--text-color); border: 1px solid var(--accent-color);" readonly></textarea>
+            </div>
+            <!-- 测试用区域
+            <div class="flex-container flexnowrap">
+                <hr>
+                <h3>测试区域</h3>
+                <div class="flex-container flexnowrap">
+                    <div style="margin: 10px 0; width: 100%;">
+                        <input type="text" id="test_message" placeholder="输入测试消息" style="width: 70%;">
+                        <input type="button" id="show_chat" value="显示当前聊天" class="menu_button">
+                        <input type="button" id="replace_chat" value="替换聊天" class="menu_button">
+                    </div>
+                </div>
+            </div> 
+            -->
+        </div>
+    </div>
+</div>

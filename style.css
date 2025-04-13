@@ -1,0 +1,46 @@
+.WebSocket-Client_connection {
+    margin-bottom: 10px;
+}
+
+.WebSocket-Client_server_settings {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.WebSocket-Client_url_input,
+.WebSocket-Client_port_input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.WebSocket-Client_url_input label,
+.WebSocket-Client_port_input label {
+    min-width: 80px;
+}
+
+.WebSocket-Client_controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.WebSocket-Client_status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.WebSocket-Client_debug {
+    margin-top: 10px;
+}
+
+#debug_log {
+    font-family: monospace;
+    font-size: 12px;
+    resize: vertical;
+}

@@ -1,0 +1,11 @@
+{
+    "display_name": "SillyTavern WebSocket Client",
+    "loading_order": 9,
+    "requires": [],
+    "optional": [],
+    "js": "index.js",
+    "css": "style.css",
+    "author": "c1t",
+    "version": "1.0.0",
+    "homePage": "https://github.com/c1t/SillyTavern-WebSocketClient"
+}
