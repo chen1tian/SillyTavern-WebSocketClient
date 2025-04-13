@@ -5,6 +5,24 @@
             <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
         </div>
         <div class="inline-drawer-content">
+            <style>
+                .received-message {
+                    margin: 10px 0;
+                    padding: 10px;
+                    border-radius: 5px;
+                    background-color: var(--SmartThemeShadowColor);
+                    border-left: 3px solid var(--accent-color);
+                }
+                .message-header {
+                    font-weight: bold;
+                    margin-bottom: 5px;
+                    color: var(--accent-color);
+                }
+                .message-content {
+                    white-space: pre-wrap;
+                    word-break: break-word;
+                }
+            </style>
             <div class="WebSocket-Client_connection">
                 <div class="WebSocket-Client_server_settings">
                     <div class="WebSocket-Client_url_input">
@@ -33,19 +51,17 @@
                 <label>调试信息:</label>
                 <textarea id="debug_log" rows="10" style="width: 100%; background-color: var(--background-color); color: var(--text-color); border: 1px solid var(--accent-color);" readonly></textarea>
             </div>
-            <!-- 测试用区域
+            <!-- 测试区域 -->
             <div class="flex-container flexnowrap">
                 <hr>
                 <h3>测试区域</h3>
                 <div class="flex-container flexnowrap">
                     <div style="margin: 10px 0; width: 100%;">
                         <input type="text" id="test_message" placeholder="输入测试消息" style="width: 70%;">
-                        <input type="button" id="show_chat" value="显示当前聊天" class="menu_button">
-                        <input type="button" id="replace_chat" value="替换聊天" class="menu_button">
+                        <input type="button" id="send_test_message" value="发送测试消息" class="menu_button">
                     </div>
                 </div>
-            </div> 
-            -->
+            </div>
         </div>
     </div>
 </div>

@@ -2,7 +2,7 @@ import { extension_settings, getContext } from "../../../extensions.js";
 import { saveSettingsDebounced } from "../../../../script.js";
 import { chat } from "../../../../script.js";
 
-const extensionName = "SillyTavern-WebSocket-Client";
+const extensionName = "SillyTavern-WebSocketClient";
 const defaultSettings = {
     wsUrl: "127.0.0.1",
     wsPort: 9919,
@@ -58,49 +58,87 @@ function setupWebSocket() {
     const wsPort = $('#ws_port').val();
     updateDebugLog(`尝试连接WebSocket服务器: ws://${wsUrl}:${wsPort}`);
 
-    ws = new WebSocket(`ws://${wsUrl}:${wsPort}`);
+    try {
+        ws = new WebSocket(`ws://${wsUrl}:${wsPort}`);
 
-    ws.onopen = () => {
-        updateWSStatus(true);
-        updateConnectionButtons(true);
-        updateDebugLog('WebSocket连接已建立');
-        
-        // 发送当前聊天历史
-        sendChatHistory();
-    };
+        ws.onopen = () => {
+            updateWSStatus(true);
+            updateConnectionButtons(true);
+            updateDebugLog('WebSocket连接已建立');
+            
+            // 发送当前聊天历史
+            sendChatHistory();
+            
+            // 发送测试消息
+            sendTestMessage("WebSocket客户端已连接");
+        };
 
-    ws.onmessage = async (event) => {
-        try {
-            const data = JSON.parse(event.data);
-            updateDebugLog(`收到消息: ${JSON.stringify(data)}`);
+        ws.onmessage = async (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                updateDebugLog(`收到消息: ${JSON.stringify(data)}`);
 
-            // 处理接收到的消息
-            if (data.type === 'chat_message') {
-                // 这里可以处理从服务器接收到的聊天消息
-                // 例如，可以将其添加到SillyTavern的聊天中
-                updateDebugLog(`收到聊天消息: ${data.content}`);
+                // 处理接收到的消息
+                if (data.type === 'chat_message') {
+                    // 处理聊天消息
+                    handleChatMessage(data);
+                } else if (data.type === 'test_message') {
+                    // 处理测试消息
+                    updateDebugLog(`收到测试消息: ${data.content}`);
+                } else if (data.type === 'error') {
+                    // 处理错误消息
+                    updateDebugLog(`收到错误消息: ${data.content}`);
+                } else {
+                    // 处理其他类型的消息
+                    updateDebugLog(`收到未知类型消息: ${JSON.stringify(data)}`);
+                }
+            } catch (error) {
+                updateDebugLog(`处理消息时出错: ${error.message}`);
+                console.error(error);
             }
-        } catch (error) {
-            updateDebugLog(`处理消息时出错: ${error.message}`);
-            console.error(error);
-        }
-    };
+        };
 
-    ws.onclose = () => {
+        ws.onclose = () => {
+            updateWSStatus(false);
+            updateConnectionButtons(false);
+            updateDebugLog('WebSocket连接已关闭');
+            
+            // 如果启用了自动重连，则开始尝试重新连接
+            if (extension_settings[extensionName].autoConnect) {
+                startAutoConnect();
+            }
+        };
+
+        ws.onerror = (error) => {
+            updateWSStatus(false);
+            updateDebugLog(`WebSocket错误: ${error}`);
+        };
+    } catch (error) {
         updateWSStatus(false);
-        updateConnectionButtons(false);
-        updateDebugLog('WebSocket连接已关闭');
+        updateDebugLog(`创建WebSocket连接时出错: ${error.message}`);
+        console.error(error);
+    }
+}
+
+// 发送测试消息
+function sendTestMessage(message) {
+    if (!ws || ws.readyState !== WebSocket.OPEN) {
+        updateDebugLog('无法发送测试消息：WebSocket未连接');
+        return;
+    }
+    
+    try {
+        const messageData = {
+            type: 'test_message',
+            content: message
+        };
         
-        // 如果启用了自动重连，则开始尝试重新连接
-        if (extension_settings[extensionName].autoConnect) {
-            startAutoConnect();
-        }
-    };
-
-    ws.onerror = (error) => {
-        updateWSStatus(false);
-        updateDebugLog(`WebSocket错误: ${error}`);
-    };
+        ws.send(JSON.stringify(messageData));
+        updateDebugLog(`已发送测试消息: ${message}`);
+    } catch (error) {
+        updateDebugLog(`发送测试消息时出错: ${error.message}`);
+        console.error(error);
+    }
 }
 
 // 断开WebSocket连接
@@ -196,6 +234,43 @@ function onChatChanged() {
     }
 }
 
+// 处理聊天消息
+function handleChatMessage(data) {
+    try {
+        if (!data.content) {
+            updateDebugLog('收到的聊天消息格式不正确');
+            return;
+        }
+        
+        const { role, content, name } = data.content;
+        
+        // 显示接收到的消息
+        displayReceivedMessage(role, content, name);
+        
+        // 如果需要，可以将消息添加到SillyTavern的聊天中
+        // 这里需要根据SillyTavern的API来实现
+        updateDebugLog(`收到聊天消息: ${content} (来自: ${name}, 角色: ${role})`);
+    } catch (error) {
+        updateDebugLog(`处理聊天消息时出错: ${error.message}`);
+        console.error(error);
+    }
+}
+
+// 显示接收到的消息
+function displayReceivedMessage(role, content, name) {
+    // 这里可以根据需要实现显示消息的逻辑
+    // 例如，可以创建一个新的div来显示消息
+    const messageDiv = $('<div>').addClass('received-message');
+    messageDiv.append($('<div>').addClass('message-header').text(`${name} (${role})`));
+    messageDiv.append($('<div>').addClass('message-content').text(content));
+    
+    // 将消息添加到调试日志下方
+    $('#debug_log').after(messageDiv);
+    
+    // 滚动到消息
+    messageDiv[0].scrollIntoView({ behavior: 'smooth' });
+}
+
 // 初始化扩展
 jQuery(async () => {
     // 加载HTML模板
@@ -210,6 +285,16 @@ jQuery(async () => {
     // 绑定事件处理
     $('#ws_connect').on('click', setupWebSocket);
     $('#ws_disconnect').on('click', disconnectWebSocket);
+    
+    // 绑定测试消息按钮事件
+    $('#send_test_message').on('click', function() {
+        const message = $('#test_message').val();
+        if (message) {
+            sendTestMessage(message);
+        } else {
+            updateDebugLog('请输入测试消息');
+        }
+    });
     
     // 保存设置
     $('#ws_url').on('change', function() {
