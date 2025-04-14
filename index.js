@@ -1,6 +1,8 @@
 import { extension_settings, getContext } from "../../../extensions.js";
 import { saveSettingsDebounced } from "../../../../script.js";
 import { chat } from "../../../../script.js";
+import { eventSource, event_types } from "../../../../script.js";
+
 
 const extensionName = "SillyTavern-WebSocketClient";
 const defaultSettings = {
@@ -208,6 +210,11 @@ function sendChatHistory() {
 
 // 监听聊天变化事件
 function onChatChanged() {
+     // 获取最新的消息
+     const latestMessage = chat[chat.length - 1];
+     // 打印
+     console.log("latestMessage", latestMessage);
+
     if (!ws || ws.readyState !== WebSocket.OPEN) {
         return;
     }
@@ -271,6 +278,14 @@ function displayReceivedMessage(role, content, name) {
     messageDiv[0].scrollIntoView({ behavior: 'smooth' });
 }
 
+function handleIncomingMessage() {
+    // Handle message
+     // 获取最新的消息
+     const latestMessage = chat[chat.length - 1];
+     // 打印
+     console.log("latestMessage", latestMessage);
+}
+
 // 初始化扩展
 jQuery(async () => {
     // 加载HTML模板
@@ -321,10 +336,8 @@ jQuery(async () => {
         }
     });
     
-    // 监听聊天变化事件
-    const context = getContext();
-    context.eventSource.on(context.eventTypes.CHAT_CHANGED, onChatChanged);
-    
+    // 监听聊天变化事件    
+    eventSource.on(event_types.MESSAGE_RECEIVED, onChatChanged);    
     updateDebugLog('WebSocket客户端扩展初始化完成');
     
     // 如果启用了自动连接，则立即连接
