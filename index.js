@@ -278,12 +278,27 @@ function displayReceivedMessage(role, content, name) {
     messageDiv[0].scrollIntoView({ behavior: 'smooth' });
 }
 
-function handleIncomingMessage() {
-    // Handle message
-     // 获取最新的消息
-     const latestMessage = chat[chat.length - 1];
-     // 打印
-     console.log("latestMessage", latestMessage);
+function onStreamTokenReceived(data) {
+    console.log("onStreamTokenReceived", data);
+
+    if (!ws || ws.readyState !== WebSocket.OPEN) {
+        return;
+    }
+    
+    try {        
+        const messageData = {
+            type: 'stream_token',
+            content: data
+        };
+
+        const msg = JSON.stringify(messageData)
+        
+        ws.send(msg);
+        updateDebugLog(`已发送消息: ${data}`);
+    } catch (error) {
+        updateDebugLog(`发送消息时出错: ${error.message}`);
+        console.error(error);
+    }
 }
 
 // 初始化扩展
@@ -337,7 +352,9 @@ jQuery(async () => {
     });
     
     // 监听聊天变化事件    
-    eventSource.on(event_types.MESSAGE_RECEIVED, onChatChanged);    
+    // eventSource.on(event_types.MESSAGE_RECEIVED, onChatChanged);    
+    eventSource.on(event_types.STREAM_TOKEN_RECEIVED, onStreamTokenReceived);
+
     updateDebugLog('WebSocket客户端扩展初始化完成');
     
     // 如果启用了自动连接，则立即连接
